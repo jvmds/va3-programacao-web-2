@@ -94,7 +94,7 @@ module.exports = {
         
     },
 
-    async remove(req, res) {
+    remove(req, res) {
         fs.readFile(urlDb, 'utf-8', (err, data) => {
             if (err){return res.status(500).json({error: err.message});}
             
