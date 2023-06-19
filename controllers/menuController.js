@@ -61,5 +61,61 @@ module.exports = {
         
     },
 
-    //
+   update(req, res){
+        const {error, value} = item.validate(req.body);
+        if (!error){
+            fs.readFile(urlDb, 'utf-8', (err, data) => {
+                if (err) {return res.status(500).json({error: err.message});}
+                let json = JSON.parse(data);
+
+                const {id} = req.params;
+                const item = json.itens.find(e => e.id === id);
+                if (item){
+                    item.nome = value.nome;
+                    item.descricao = value.descricao;
+                    item.preco = value.preco;
+
+                    fs.writeFile(urlDb, JSON.stringify(json), 'utf-8', async (err) => {
+                        if (err) {throw err;}
+    
+                        return res.status(200).json(item);
+                    });
+                }
+                else{
+                    res.status(404).json({
+                        error: `item ${id} não encontrado`
+                    });
+                }
+            });
+        }
+        else{
+            res.status(400).json(error);
+        }
+        
+    },
+
+    remove(req, res) {
+        fs.readFile(urlDb, 'utf-8', (err, data) => {
+            if (err){return res.status(500).json({error: err.message});}
+            
+            let json = JSON.parse(data);
+            
+            const {id} = req.params;
+            const indexItem = json.itens.findIndex(e => e.id === id);
+            if (indexItem != -1){
+                json.itens.splice(indexItem, 1);
+
+                fs.writeFile(urlDb, JSON.stringify(json), 'utf-8', async (err) => {
+                    if (err) {throw err;}
+
+                    return res.status(200).json({});
+                });
+            }
+            else{
+                res.status(404).json({
+                    error: `item ${id} não encontrado`
+                });
+            }
+        });
+    }
 };
